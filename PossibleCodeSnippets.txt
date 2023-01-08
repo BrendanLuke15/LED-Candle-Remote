@@ -1,0 +1,75 @@
+void sendSignal(byte add, byte sig) {
+  // Construct 32 bit signal
+  long fullSignal = 0; // empty signal (00000000 00000000 00000000 00000000)
+  uint8_t sigPos = 31; // bit index in fullSignal  
+    // Address
+    for (int iBit = 7; iBit > -1; iBit--) {
+      //Serial.print(bitRead(add,iBit));
+      //sendBit(bitRead(add,iBit));
+      bitWrite(fullSignal,sigPos,bitRead(add,iBit));
+      sigPos--;
+    }
+    // Address inverted
+    for (int iBit = 7; iBit > -1; iBit--) {
+      //Serial.print(!bitRead(add,iBit));
+      //sendBit(!bitRead(add,iBit));
+      bitWrite(fullSignal,sigPos,!bitRead(add,iBit));
+      sigPos--;
+    }
+    // Signal
+    for (int iBit = 7; iBit > -1; iBit--) {
+      //Serial.print(bitRead(sig,iBit));
+      //sendBit(bitRead(sig,iBit));
+      bitWrite(fullSignal,sigPos,bitRead(sig,iBit));
+      sigPos--;
+    }
+    // Signal inverted
+    for (int iBit = 7; iBit > -1; iBit--) {
+      //Serial.print(!bitRead(sig,iBit));
+      //sendBit(!bitRead(sig,iBit));
+      bitWrite(fullSignal,sigPos,!bitRead(sig,iBit));
+      sigPos--;
+    }
+  //Serial.println(fullSignal);
+  // Send Signal
+  for (int iBit = 31; iBit > -1; iBit--) {
+    sendBit(bitRead(fullSignal,iBit));
+  }
+}
+
+void sendBit(bool Bit) { // true = 1, false = 0
+  
+  if (Bit) { // true, 1, long bit
+    while (i < cycles) {
+      /*
+      digitalWrite(IR_Pin,HIGH);
+      delayMicroseconds(wait);
+      digitalWrite(IR_Pin,LOW);
+      delayMicroseconds(wait);
+      */
+      PORTB = B00000001; // set digital pin 8 HIGH
+      delayMicroseconds(wait); // leave ON for time
+      PORTB = B00000000; // set digital pin 8 LOW
+      delayMicroseconds(wait); // leave OFF for time
+      i++;
+    }
+    i = 0; // reset i counter
+    delayMicroseconds(1240);
+  } else { // false, 0, short bit
+    while (i < cycles) {
+      /*
+      digitalWrite(IR_Pin,HIGH);
+      delayMicroseconds(wait);
+      digitalWrite(IR_Pin,LOW);
+      delayMicroseconds(wait);
+      */
+      PORTB = B00000001; // set digital pin 8 HIGH
+      delayMicroseconds(wait); // leave ON for time
+      PORTB = B00000000; // set digital pin 8 LOW
+      delayMicroseconds(wait); // leave OFF for time
+      i++;
+    }
+    i = 0; // reset i counter
+    delayMicroseconds(400);
+  }
+}
